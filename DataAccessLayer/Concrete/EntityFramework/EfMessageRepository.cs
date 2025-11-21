@@ -18,7 +18,7 @@ public class EfMessageRepository : EfEntityRepositoryBase<Message>, IMessageDal
 
     public EfMessageRepository(Context context) : base(context)
     {
-        Context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
     }
 
     private Context Context => _context as Context;
@@ -52,7 +52,7 @@ public class EfMessageRepository : EfEntityRepositoryBase<Message>, IMessageDal
 
         query = take > 0 ? query.Skip(skip).Take(take) : query;
 
-        return await query.ToListAsync(CancellationToken);
+        return await query.AsNoTrackingWithIdentityResolution().ToListAsync(CancellationToken);
     }
     public async Task<Message> GetReceivedMessageAsync(int id, Expression<Func<Message, bool>> filter = null)
     {
@@ -66,9 +66,9 @@ public class EfMessageRepository : EfEntityRepositoryBase<Message>, IMessageDal
     {
         return filter == null ?
            await Context.Messages.Include(x => x.ReceiverUser)
-        .Where(x => x.SenderUser.Id == id).FirstOrDefaultAsync() :
+        .Where(x => x.SenderUser.Id == id).AsNoTracking().FirstOrDefaultAsync() :
         await Context.Messages.Include(x => x.ReceiverUser)
-        .Where(x => x.SenderUser.Id == id).FirstOrDefaultAsync(filter, CancellationToken);
+        .Where(x => x.SenderUser.Id == id).AsNoTracking().FirstOrDefaultAsync(filter, CancellationToken);
     }
 
     public async Task<List<MessageReceiverUserDto>> GetSendBoxWithMessageListAsync(int id, Expression<Func<MessageReceiverUserDto, bool>> filter = null, int take = 0, int skip = 0)
@@ -97,6 +97,6 @@ public class EfMessageRepository : EfEntityRepositoryBase<Message>, IMessageDal
 
         query = take > 0 ? query.Skip(skip).Take(take) : query;
 
-        return await query.ToListAsync(CancellationToken);
+        return await query.AsNoTrackingWithIdentityResolution().ToListAsync(CancellationToken);
     }
 }

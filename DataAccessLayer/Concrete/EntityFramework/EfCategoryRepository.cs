@@ -57,6 +57,6 @@ public class EfCategoryRepository : EfEntityRepositoryBase<Category>, ICategoryD
             BlogStatus = data.Key.BlogStatus
         });
 
-        return await query.ToListAsync(CancellationToken);
+        return await query.AsNoTracking().ToListAsync(CancellationToken);
     }
 }

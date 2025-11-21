@@ -660,7 +660,7 @@ public class BlogManager : ManagerBase, IBlogService
 
                 string newName = blog.BlogImage.Substring(index + 1);
 
-                bool isMove = await FileManager.FileMoveAsync(oldName, newName);
+                bool isMove = await FileManager.FileMoveAsync(oldName, newName, cancellationToken: CancellationToken);
 
                 if (isMove)
                     blog.BlogImage = newName;

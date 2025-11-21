@@ -1,7 +1,6 @@
 ﻿using CoreLayer.DataAccess.EntityFramework;
 using DataAccessLayer.Abstract;
 using EntityLayer.Concrete;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

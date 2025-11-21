@@ -62,7 +62,7 @@ public class EfBlogRepository : EfEntityRepositoryBase<Blog>, IBlogDal
             query = query.Where(filter);
         }
 
-        var result = await query.ToPagedListAsync(pageNumber, pageSize, null, CancellationToken);
+        var result = await query.AsNoTrackingWithIdentityResolution().ToPagedListAsync(pageNumber, pageSize, null, CancellationToken);
 
         return result;
     }
@@ -77,7 +77,7 @@ public class EfBlogRepository : EfEntityRepositoryBase<Blog>, IBlogDal
 
         query = query.OrderByDescending(x => x.BlogID);
 
-        return await query.ToPagedListAsync(pageNumber, pageSize,null, CancellationToken);
+        return await query.AsNoTrackingWithIdentityResolution().ToPagedListAsync(pageNumber, pageSize,null, CancellationToken);
     }
 
     public async Task<BlogCategoryandCommentCountandWriterDto> GetBlogWithCommentandWriterAsync(bool isCommentStatus, Expression<Func<BlogCategoryandCommentCountandWriterDto, bool>> filter)
@@ -113,7 +113,7 @@ public class EfBlogRepository : EfEntityRepositoryBase<Blog>, IBlogDal
                         BlogViewCount = blog.BlogViews.Count()
                     };
 
-        var data = await query.Where(filter).FirstOrDefaultAsync(CancellationToken);
+        var data = await query.Where(filter).AsNoTracking().FirstOrDefaultAsync(CancellationToken);
 
         return data;
     }
@@ -137,6 +137,6 @@ public class EfBlogRepository : EfEntityRepositoryBase<Blog>, IBlogDal
 
         query = filter != null ? query.Where(filter) : query;
 
-        return await query.CountAsync(CancellationToken);
+        return await query.AsNoTracking().CountAsync(CancellationToken);
     }
 }

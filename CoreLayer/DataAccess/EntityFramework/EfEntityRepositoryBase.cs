@@ -1,6 +1,4 @@
-﻿
-
-using CoreLayer.Entities;
+﻿using CoreLayer.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -27,13 +25,12 @@ public class EfEntityRepositoryBase<TEntity> : IEntityRepository<TEntity>
     public EfEntityRepositoryBase(DbContext context)
     {
         _context = context;
-        _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
     protected IHttpContextAccessor HttpContextAccessor =>
     _httpContextAccessor ??= _context.Database.GetService<IHttpContextAccessor>();
 
-    // CancellationToken'ı da HttpContextAccessor property'si üzerinden çağırın
+
     private CancellationToken CancellationToken =>
         HttpContextAccessor?.HttpContext?.RequestAborted ?? CancellationToken.None;
 
@@ -88,7 +85,9 @@ public class EfEntityRepositoryBase<TEntity> : IEntityRepository<TEntity>
 
             if (include != null) queryable = include(queryable);
 
-            if (!enableTracking) queryable = queryable.AsNoTracking();
+            if (!enableTracking && include == null) queryable = queryable.AsNoTracking();
+
+            if (!enableTracking && include != null) queryable = queryable.AsNoTrackingWithIdentityResolution();
 
             var filteredResult = filter == null ?
             await queryable.Skip(skip).Take(take).ToListAsync(CancellationToken) :
@@ -287,7 +286,7 @@ public class EfEntityRepositoryBase<TEntity> : IEntityRepository<TEntity>
     {
         IQueryable<TEntity> query = _context.Set<TEntity>();
 
-        if (!enableTracking)
+        if (!enableTracking && include == null)
         {
             query = query.AsNoTracking();
         }
@@ -295,6 +294,11 @@ public class EfEntityRepositoryBase<TEntity> : IEntityRepository<TEntity>
         if (include != null)
         {
             query = include(query);
+
+            if (!enableTracking)
+            {
+                query = query.AsNoTrackingWithIdentityResolution();
+            }
         }
 
         if (predicate != null)

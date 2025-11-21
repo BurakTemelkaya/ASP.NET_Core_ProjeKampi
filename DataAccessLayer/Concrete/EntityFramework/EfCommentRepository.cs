@@ -2,7 +2,6 @@
 using CoreLayer.DataAccess.EntityFramework;
 using DataAccessLayer.Abstract;
 using EntityLayer.Concrete;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -52,7 +51,7 @@ public class EfCommentRepository : EfEntityRepositoryBase<Comment>, ICommentDal
         if (take > 0)
             query = query.Skip(skip).Take(take);
 
-        return await query.ToListAsync(CancellationToken);
+        return await query.AsNoTracking().ToListAsync(CancellationToken);
 
     }
 
