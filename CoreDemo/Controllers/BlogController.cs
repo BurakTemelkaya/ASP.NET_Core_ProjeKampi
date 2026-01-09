@@ -1,10 +1,13 @@
 ﻿using BusinessLayer.Abstract;
 using BusinessLayer.Models;
 using CoreLayer.Utilities.MailUtilities;
+using CoreLayer.Utilities.Results;
 using EntityLayer.Concrete;
+using EntityLayer.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 using System.Threading.Tasks;
 using X.PagedList;
 using X.PagedList.Extensions;
@@ -28,7 +31,7 @@ public class BlogController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Index(GetBlogModel getBlogModel)
     {
-        var values = await _blogService.GetBlogListByMainPage(getBlogModel);
+        IDataResult<IPagedList<BlogCategoryandCommentCountDto>> values = await _blogService.GetBlogListByMainPage(getBlogModel);
 
         ViewData["Title"] = "Ana Sayfa";
 
