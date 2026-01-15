@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLayer.Abstract;
 using BusinessLayer.Constants;
+using CoreLayer.Entities;
 using CoreLayer.Utilities.Results;
 using DataAccessLayer.Abstract;
 using EntityLayer.Concrete;
@@ -11,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Threading.Tasks;
 using X.PagedList;
@@ -60,7 +62,7 @@ public class LoginLoggerManager : ManagerBase, ILoginLoggerService
         return location;
     }
 
-    public async Task<IResultObject> AddAsync(string userName,HttpContext httpContext)
+    public async Task<IResultObject> AddAsync(string userName, HttpContext httpContext)
     {
         if (!_webHostEnvironment.IsProduction())
         {
@@ -123,20 +125,21 @@ public class LoginLoggerManager : ManagerBase, ILoginLoggerService
 
     public async Task<IDataResult<IPagedList<LoginLogger>>> GetListAllAsync(int page = 1, int take = 10, string userName = null)
     {
+        Expression<Func<LoginLogger, bool>> predicate = null;
+
         if (!string.IsNullOrEmpty(userName))
         {
+            predicate = ll => ll.User.UserName == userName;
+
             var user = await _userService.GetByUserNameAsync(userName);
             if (!user.Success)
             {
                 return new ErrorDataResult<IPagedList<LoginLogger>>(Messages.UserNotFound);
             }
-            IPagedList<LoginLogger> data = await _loginLogger.GetPagedListAsync(page, take, x => x.UserId == user.Data.Id, orderBy: x => x.OrderByDescending(ll => ll.Id));
-            return new SuccessDataResult<IPagedList<LoginLogger>>(data);
         }
-        else
-        {
-            var data = await _loginLogger.GetPagedListAsync(page, take, include: x => x.Include(i => i.User), orderBy: x => x.OrderByDescending(ll => ll.Id));
-            return new SuccessDataResult<IPagedList<LoginLogger>>(data);
-        }
+
+        var data = await _loginLogger.GetPagedListAsync(page, take, predicate, include: x => x.Include(i => i.User), orderBy: x => x.OrderByDescending(ll => ll.Id));
+        return new SuccessDataResult<IPagedList<LoginLogger>>(data);
+
     }
 }
