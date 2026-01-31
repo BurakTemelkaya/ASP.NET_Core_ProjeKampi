@@ -4,6 +4,7 @@ using CoreLayer.Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -18,8 +19,6 @@ namespace Core.Extensions
         private LoggerServiceBase _databaseLoggerServiceBase;
 
         private LoggerServiceBase _fileLoggerServiceBase;
-
-        private Exception _lastException;
 
         public ExceptionMiddleware(RequestDelegate next)
         {
@@ -36,49 +35,48 @@ namespace Core.Extensions
             {
                 await _next(httpContext);
             }
+            catch (OperationCanceledException)
+            {
+                // 1. İptal durumunda log kirliliği yapmıyoruz. 
+                _fileLoggerServiceBase.Info($"İşlem kullanıcı tarafından iptal edildi: {httpContext.Request.Path}");
+
+                // Bağlantı koptuğu için Redirect veya ağır modellerle uğraşmıyoruz.
+                httpContext.Response.StatusCode = 499;
+            }
+            catch (ValidationException validationException)
+            {
+                HandleValidationException(validationException, httpContext);
+            }
             catch (Exception exception)
             {
-                HandleException(exception, httpContext);
+                HandleGenericException(exception, httpContext);
             }
         }
 
-        private void HandleException(Exception exception, HttpContext httpContext)
+        private void HandleValidationException(ValidationException exception, HttpContext httpContext)
         {
-            IEnumerable<ValidationFailure> errors;
-
-            if (exception.GetType() == typeof(ValidationException))
+            ValidationErrorDetail exceptionModel = new()
             {
-                string message = exception.Message;
-                errors = ((ValidationException)exception).Errors;
+                StatusCode = (int)HttpStatusCode.BadRequest,
+                Message = exception.Message,
+                ValidationErrors = exception.Errors
+            };
 
-                var exceptionModel = new ValidationErrorDetail
-                {
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    Message = message,
-                    ValidationErrors = errors
-                };
+            _databaseLoggerServiceBase.Error(exceptionModel);
+            _fileLoggerServiceBase.Error(exceptionModel);
 
-                if (_lastException == null || exception.Message != _lastException.Message)
-                {
-                    _databaseLoggerServiceBase.Error(exceptionModel);
+            // Header gönderilmediyse yönlendir
+            if (!httpContext.Response.HasStarted)
+                httpContext.Response.Redirect(httpContext.Request.Path.ToString());
+        }
 
-                    _fileLoggerServiceBase.Error(exceptionModel);
+        private void HandleGenericException(Exception exception, HttpContext httpContext)
+        {
+            _databaseLoggerServiceBase.Error(exception);
+            _fileLoggerServiceBase.Error(exception);
 
-                    httpContext.Response.Redirect(httpContext.Request.Path.ToString());
-                }       
-            }
-            else
-            {
-                if (_lastException == null || exception.Message != _lastException.Message)
-                {
-                    _databaseLoggerServiceBase.Error(exception);
-                    _fileLoggerServiceBase.Error(exception);
-
-                    httpContext.Response.Redirect("/ErrorPage/Error404");
-                }
-            }
-
-            _lastException = exception;
+            if (!httpContext.Response.HasStarted)
+                httpContext.Response.Redirect("/ErrorPage/Error404");
         }
     }
 }
