@@ -43,9 +43,23 @@
     <!-- Kritik CSS'ler -->
     <style>
         /* Temel font ve layout stilleri */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 0; }
-        .navbar { padding: .5rem 1rem; }
-        .container { width: 100%; padding-right: 15px; padding-left: 15px; margin-right: auto; margin-left: auto; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            padding: .5rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
     </style>
 
     <!-- Font preload - Local fonts -->
@@ -55,34 +69,34 @@
     <link rel="preload" href="~/CoreBlogTema/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="~/CoreBlogTema/webfonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="~/CoreBlogTema/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-    
-    <!-- Local Poppins Font -->
-    <link href="~/css/poppins-local.css" rel="stylesheet">
-    
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap&subset=latin-ext" rel="stylesheet">
+
     <!-- Font Awesome -->
     <link href="~/CoreBlogTema/css/fontawesome-all.min.css" rel="stylesheet">
-    
+
     <!-- Bootstrap -->
     <link href="~/coreblogtema/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Layout shift önleyici -->
     <link href="~/css/layout-fix.css" rel="stylesheet">
-    
+
     <!-- Font yükleme optimizasyonu için stil -->
     <style>
         .wf-loading {
             visibility: hidden;
         }
+
         .wf-active {
             visibility: visible;
         }
     </style>
-    
+
     <!-- Font yükleme kontrolü için script -->
     <script>
         document.documentElement.classList.add('wf-loading');
-        window.addEventListener('load', function() {
-            setTimeout(function() {
+        window.addEventListener('load', function () {
+            setTimeout(function () {
                 document.documentElement.classList.remove('wf-loading');
                 document.documentElement.classList.add('wf-active');
             }, 100);
@@ -112,14 +126,23 @@
 
         <link rel="preload" href="~/writer/assets/css/SweetAlert2.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <noscript><link rel="stylesheet" href="~/writer/assets/css/SweetAlert2.min.css" /></noscript>
-        
+
     }
 
     <link rel="preload" href="~/coreblogtema/css/thema-toggle.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="~/coreblogtema/css/thema-toggle.css" /></noscript>
 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XRW0DQMQ2P"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    @RenderSection("HeaderSection",false)
+        gtag('config', 'G-XRW0DQMQ2P');
+    </script>
+
+    @RenderSection("HeaderSection", false)
 </head>
 
 <body>
