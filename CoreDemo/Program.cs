@@ -128,7 +128,7 @@ builder.Services.AddAuthentication(
 
 builder.Services.AddSingleton(new WriterCity());
 
-builder.Services.AddAutoMapper(typeof(BusinessImages), typeof(UIImage), typeof(DBOImages));
+builder.Services.AddAutoMapper(cfg => { }, typeof(BusinessImages), typeof(UIImage), typeof(DBOImages));
 
 builder.Services
     .AddDependencyResolvers(
