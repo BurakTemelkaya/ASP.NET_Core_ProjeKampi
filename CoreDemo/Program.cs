@@ -18,26 +18,20 @@ using DataAccessLayer.Concrete;
 using DataAccessLayer.DependancyInjection;
 using EntityLayer.Concrete;
 using FluentValidation.AspNetCore;
-using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -156,20 +150,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = new PathString("/Login/AccessDenied");
 });
 
-
-if (builder.Environment.IsProduction())
-{
-    builder.Services
-    .AddHealthChecks()
-    .AddDbContextCheck<Context>()
-    .AddApplicationInsightsPublisher()
-    .AddSqlServer(builder.Configuration.GetConnectionString("SQLServer"));
-
-    builder.Services
-        .AddHealthChecksUI()
-        .AddSqlServerStorage(builder.Configuration.GetConnectionString("SQLServer"));
-}
-
 var app = builder.Build();
 
 app.UseHttpsRedirection();
@@ -198,18 +178,6 @@ if (app.Environment.IsProduction())
     app.UseUserDestroyer("/Blog/Index");
     app.UseHsts();
     app.ConfigureCustomExceptionMiddleware();
-
-    app.UseHealthChecks("/health", new HealthCheckOptions
-    {
-        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
-    });
-
-    app.UseHealthChecksPrometheusExporter("/my-health-metrics", options => options.ResultStatusCodes[HealthStatus.Unhealthy] = (int)HttpStatusCode.OK);
-
-    app.UseHealthChecksUI(options =>
-    {
-        options.UIPath = "/health-ui";
-    });
 }
 else
 {
