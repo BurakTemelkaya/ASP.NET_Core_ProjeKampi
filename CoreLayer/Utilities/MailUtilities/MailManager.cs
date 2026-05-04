@@ -54,6 +54,7 @@ public class MailKitMailService : IMailService
         email.Subject = mail.Subject;
         if (mail.UnsubscribeLink != null)
             email.Headers.Add(field: "List-Unsubscribe", value: $"<{mail.UnsubscribeLink}>");
+
         BodyBuilder bodyBuilder = new() { TextBody = mail.TextBody, HtmlBody = mail.HtmlBody };
 
         if (mail.Attachments != null)
@@ -62,6 +63,9 @@ public class MailKitMailService : IMailService
                     bodyBuilder.Attachments.Add(attachment);
 
         email.Body = bodyBuilder.ToMessageBody();
+
+        email.MessageId = MimeKit.Utils.MimeUtils.GenerateMessageId(_mailSettings.DomainName);
+
         email.Prepare(EncodingConstraint.SevenBit);
 
         if (_mailSettings.DkimPrivateKey != null && _mailSettings.DkimSelector != null && _mailSettings.DomainName != null)
@@ -74,12 +78,16 @@ public class MailKitMailService : IMailService
                     AgentOrUserIdentifier = $"@{_mailSettings.DomainName}",
                     QueryMethod = "dns/txt"
                 };
-            HeaderId[] headers = { HeaderId.From, HeaderId.Subject, HeaderId.To };
+            HeaderId[] headers = { HeaderId.From, HeaderId.Subject, HeaderId.To, HeaderId.MessageId }; // MessageId'yi imzalama listesine ekleyebilirsin
             signer.Sign(email, headers);
         }
 
         smtp = new SmtpClient();
-        smtp.Connect(_mailSettings.Server, _mailSettings.Port);
+
+        smtp.LocalDomain = _mailSettings.DomainName;
+
+        smtp.Connect(_mailSettings.Server, _mailSettings.Port, MailKit.Security.SecureSocketOptions.SslOnConnect);
+
         if (_mailSettings.AuthenticationRequired)
             smtp.Authenticate(_mailSettings.UserName, _mailSettings.Password);
     }
