@@ -1,0 +1,21 @@
+services:
+  rollercoin_backend:
+    container_name: coredemo
+    image: ${IMAGE_TAG}
+    restart: always
+    user: "root"
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__SQLServer=${DB_CONNECTION_STR}
+      - SeriLogConfigurations__FileLogConfiguration__FolderPath=/app/wwwroot/logs
+    networks:
+      - global-rollercoin-network
+    volumes:
+      - /home/app/CoreDemo/logs:/app/wwwroot/logs
+      - /home/app/CoreDemo/wwwroot:/app/wwwroot
+
+networks:
+  global-rollercoin-network:
+    external: true

@@ -1,0 +1,67 @@
+name: Deploy CoreDemo to VDS via GHCR
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Get Code
+      uses: actions/checkout@v4
+
+    - name: GHCR Login
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Convert the username to lowercase
+      run: echo "REPO_OWNER=${GITHUB_REPOSITORY_OWNER,,}" >> ${GITHUB_ENV}
+
+    - name: Build and Push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ghcr.io/${{ env.REPO_OWNER }}/coredemo:latest
+
+    - name: Copy the Compose File to the VDS
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.VDS_IP }}
+        username: ${{ secrets.VDS_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "docker-compose.yml"
+        target: "/home/app/CoreDemo"
+
+    - name: VDS Deploy (SSH)
+      uses: appleboy/ssh-action@v1.0.3
+      env:
+        REPO_OWNER: ${{ env.REPO_OWNER }}
+        GH_PAT: ${{ secrets.GH_PAT }}
+        DB_CONN: ${{ secrets.DB_CONNECTION }}
+      with:
+        host: ${{ secrets.VDS_IP }}
+        username: ${{ secrets.VDS_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        envs: REPO_OWNER, GH_PAT, DB_CONN
+        script: |
+          echo "$GH_PAT" | docker login ghcr.io -u "$REPO_OWNER" --password-stdin
+          mkdir -p /home/app/CoreDemo/logs
+          cd /home/app/CoreDemo
+          
+          echo "DB_CONNECTION_STR=\"$DB_CONN\"" > .env
+          echo "IMAGE_TAG=ghcr.io/$REPO_OWNER/coredemo:latest" >> .env
+          
+          docker pull ghcr.io/$REPO_OWNER/coredemo:latest
+          docker compose down
+          docker compose up -d
+          docker image prune -f

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32825.248
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12105.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreDemo", "CoreDemo.csproj", "{A2771BAD-E403-473F-9442-FF8AE2D7A2B2}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -14,9 +14,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "..\DataA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLayer", "..\BusinessLayer\BusinessLayer.csproj", "{DC02D567-1FDF-4576-838F-B280D0A8959A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jwt_Core_Proje_Kampi", "..\Jwt_Core_Proje_Kampi\Jwt_Core_Proje_Kampi.csproj", "{4863BCB3-920B-4D13-8654-F410979C3D63}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreLayer", "..\CoreLayer\CoreLayer.csproj", "{E886F8E6-DC67-40D3-8007-45E61C8B2285}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{359B40EF-CEFE-46FC-BF90-34954583E7B2}"
+	ProjectSection(SolutionItems) = preProject
+		..\deploy.yml = ..\deploy.yml
+		..\docker-compose.yml = ..\docker-compose.yml
+		..\Dockerfile = ..\Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +45,6 @@ Global
 		{DC02D567-1FDF-4576-838F-B280D0A8959A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC02D567-1FDF-4576-838F-B280D0A8959A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC02D567-1FDF-4576-838F-B280D0A8959A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4863BCB3-920B-4D13-8654-F410979C3D63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4863BCB3-920B-4D13-8654-F410979C3D63}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4863BCB3-920B-4D13-8654-F410979C3D63}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4863BCB3-920B-4D13-8654-F410979C3D63}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E886F8E6-DC67-40D3-8007-45E61C8B2285}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E886F8E6-DC67-40D3-8007-45E61C8B2285}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E886F8E6-DC67-40D3-8007-45E61C8B2285}.Release|Any CPU.ActiveCfg = Release|Any CPU
