@@ -3,7 +3,6 @@
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<UserSecretsId>7f355d76-7e5d-423a-bf54-00a41e809eea</UserSecretsId>
-		<SixLaborsLicenseKey>SPL-Commercial-Exempt</SixLaborsLicenseKey>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -28,7 +27,7 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.11" />
 		<PackageReference Include="MimeKit" Version="4.17.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="4.1.0" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.22.0" />
 		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.3" />
 		<PackageReference Include="System.Runtime.Caching" Version="10.0.11" />
