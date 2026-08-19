@@ -17,26 +17,26 @@ public class TextFileManager
     {
         try
         {
-            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folderLocation)))
+            // Klasör yolunu temizle (Başındaki/sonundaki / işaretlerini kaldır)
+            folderLocation = folderLocation.TrimStart('/', '\\').TrimEnd('/', '\\');
+
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folderLocation);
+            if (!Directory.Exists(fullPath))
             {
-                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folderLocation));
+                Directory.CreateDirectory(fullPath);
             }
 
             var newFileName = Guid.NewGuid() + ".txt";
-            var location = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folderLocation, newFileName);
+            var location = Path.Combine(fullPath, newFileName);
 
             text = await ProcessContentAsync(text, contentImageLocation, cancellationToken);
 
-            using FileStream fileStream = new(location, FileMode.Create, FileAccess.Write);
-            using StreamWriter streamWriter = new(fileStream);
+            await File.WriteAllTextAsync(location, text, cancellationToken);
 
-            await streamWriter.WriteAsync(text.ToCharArray(), cancellationToken);
-            await streamWriter.FlushAsync(cancellationToken);
-            streamWriter.Close();
-            fileStream.Close();
-
-
-            return "/" + Path.Combine(folderLocation, newFileName);
+            // KAYIT FORMATINI STANDARTLAŞTIR: 
+            // Her zaman "/BlogContents/dosyaadi.txt" şeklinde döner. 
+            // Windows/Linux ayrımı yapmaz çünkü artık hepsini '/' ile birleştiriyoruz.
+            return "/" + folderLocation + "/" + newFileName;
         }
         catch
         {
@@ -47,10 +47,23 @@ public class TextFileManager
     {
         try
         {
+            if (string.IsNullOrEmpty(folderLocation)) return null;
+
+            // 1. Ters slash'leri düzelt ve baştaki fazla slaşleri/ters slaşleri temizle
+            folderLocation = folderLocation.Replace("\\", "/").TrimStart('/', '\\');
+
+            // 2. wwwroot ve dosya yolunu güvenli bir şekilde birleştir
             var fileLocation = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folderLocation);
-            FileStream fileStream = new(fileLocation, FileMode.Open, FileAccess.Read);
-            StreamReader streamReader = new(fileStream);
+
+            if (!File.Exists(fileLocation))
+            {
+                return null;
+            }
+
+            using FileStream fileStream = new(fileLocation, FileMode.Open, FileAccess.Read);
+            using StreamReader streamReader = new(fileStream);
             string content = await streamReader.ReadToEndAsync(cancellationToken);
+
             if (numberOfLetters > 0)
             {
                 content = Regex.Replace(content, "&nbsp;", " ");
@@ -62,15 +75,12 @@ public class TextFileManager
                     content = content[..numberOfLetters];
                 }
             }
-            streamReader.Close();
-            fileStream.Close();
             return content;
         }
         catch
         {
             return null;
         }
-
     }
 
     public static async Task<string> ProcessContentAsync(string content, string contentImageLocation, CancellationToken cancellationToken = default)
