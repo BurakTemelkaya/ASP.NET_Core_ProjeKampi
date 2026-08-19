@@ -1,5 +1,5 @@
 services:
-  rollercoin_backend:
+  coredemo:
     container_name: coredemo
     image: ${IMAGE_TAG}
     restart: always
@@ -7,12 +7,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__SQLServer=${DB_CONNECTION_STR}
-      - SeriLogConfigurations__FileLogConfiguration__FolderPath=/app/wwwroot/logs
     networks:
       - global-rollercoin-network
     volumes:
       - /home/app/CoreDemo/logs:/app/wwwroot/logs
       - /home/app/CoreDemo/wwwroot:/app/wwwroot
+      - /home/app/CoreDemo/log4net.config:/app/log4net.config:ro
 
 networks:
   global-rollercoin-network:
