@@ -12,6 +12,7 @@ services:
     volumes:
       - /home/app/CoreDemo/logs:/app/wwwroot/logs
       - /home/app/CoreDemo/wwwroot:/app/wwwroot
+      - /home/app/CoreDemo/log4net.config:/app/log4net.config:ro
 
 networks:
   global-rollercoin-network:
