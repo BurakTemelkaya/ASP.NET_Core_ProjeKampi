@@ -32,6 +32,8 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: ghcr.io/${{ env.REPO_OWNER }}/coredemo:latest
+        build-args: |
+          SIXLABORS_LICENSE=${{ secrets.SIXLABORS_LICENSE }}
 
     - name: Copy the Compose File to the VDS
       uses: appleboy/scp-action@v0.1.4
