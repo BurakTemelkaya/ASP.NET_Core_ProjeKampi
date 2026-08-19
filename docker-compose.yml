@@ -4,8 +4,6 @@ services:
     image: ${IMAGE_TAG}
     restart: always
     user: "root"
-    ports:
-      - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__SQLServer=${DB_CONNECTION_STR}
