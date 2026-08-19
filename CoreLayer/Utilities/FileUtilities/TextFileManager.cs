@@ -47,7 +47,7 @@ public class TextFileManager
     {
         try
         {
-            string fileLocation = @"wwwroot\" + folderLocation;
+            var fileLocation = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folderLocation);
             FileStream fileStream = new(fileLocation, FileMode.Open, FileAccess.Read);
             StreamReader streamReader = new(fileStream);
             string content = await streamReader.ReadToEndAsync(cancellationToken);
