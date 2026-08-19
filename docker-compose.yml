@@ -7,12 +7,15 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__SQLServer=${DB_CONNECTION_STR}
+      - RecaptchaKeys__SecretKey=${RECAPTCHA_SECRET}
+      - MailSettings__Password=${MAIL_PASSWORD}
     networks:
       - global-rollercoin-network
     volumes:
       - /home/app/CoreDemo/logs:/app/wwwroot/logs
       - /home/app/CoreDemo/wwwroot:/app/wwwroot
       - /home/app/CoreDemo/log4net.config:/app/log4net.config:ro
+      - /home/app/CoreDemo/appsettings.json:/app/appsettings.json:ro
 
 networks:
   global-rollercoin-network:
