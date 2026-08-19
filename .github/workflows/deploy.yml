@@ -2,7 +2,7 @@ name: Deploy CoreDemo to VDS via GHCR
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
