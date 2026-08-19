@@ -3,10 +3,13 @@ WORKDIR /src
 
 ARG SIXLABORS_LICENSE
 
+ENV SixLaborsLicenseKey=${SIXLABORS_LICENSE}
+
 COPY . .
 
 RUN dotnet restore "CoreDemo/CoreDemo.csproj"
-RUN dotnet publish "CoreDemo/CoreDemo.csproj" -c Release -o /app/publish /p:UseAppHost=false /p:SixLaborsLicenseKey="${SIXLABORS_LICENSE}"
+
+RUN dotnet publish "CoreDemo/CoreDemo.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
