@@ -2,8 +2,8 @@
 using BusinessLayer.Abstract;
 using BusinessLayer.Constants;
 using BusinessLayer.Models;
-using CoreLayer.Utilities.Results;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,36 +16,36 @@ public class Statistic3 : ViewComponent
     private readonly INewsLetterService _newsLetterService;
     private readonly ICommentService _commentService;
     private readonly ICategoryService _categoryService;
-    private readonly ICurrencyService _currencyService;
+    private readonly IMemoryCache _memoryCache;
     public Statistic3(IUserBusinessService userService, INewsLetterService newsLetterService, ICommentService commentService,
-        ICategoryService categoryService, ICurrencyService currencyService)
+        ICategoryService categoryService, IMemoryCache memoryCache)
     {
         _userService = userService;
         _newsLetterService = newsLetterService;
         _commentService = commentService;
         _categoryService = categoryService;
-        _currencyService = currencyService;
+        _memoryCache = memoryCache;
     }
 
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        ViewBag.UserCount = _userService.GetByUserCountAsync().Result.Data;
-        ViewBag.LikeCommentCount = _commentService.GetCountAsync(2).Result.Data;
-        ViewBag.NewsLetterCount = _newsLetterService.GetCountAsync().Result.Data;
-        ViewBag.CategoryCount = _categoryService.GetCountAsync().Result.Data;
+        ViewBag.UserCount = (await _userService.GetByUserCountAsync()).Data;
+        ViewBag.LikeCommentCount = (await _commentService.GetCountAsync(2)).Data;
+        ViewBag.NewsLetterCount = (await _newsLetterService.GetCountAsync()).Data;
+        ViewBag.CategoryCount = (await _categoryService.GetCountAsync()).Data;
 
-        IDataResult<List<CurrencysModel>> currencies = await _currencyService.GetCurrencyDataAsync(CurrencyCodes.Euro, CurrencyCodes.Dollar);
-
-        if (currencies.Success)
+        // Kurlar CurrencyWorker tarafından arka planda çekilir; burada TCMB beklenmez.
+        if (_memoryCache.TryGetValue(CurrencyWorker.CacheKey, out List<CurrencysModel> currencies))
         {
-            ViewBag.Euro = currencies.Data.First(x => x.Code == CurrencyCodes.Euro).Value;
-            ViewBag.Dolar = currencies.Data.First(x => x.Code == CurrencyCodes.Dollar).Value;
+            ViewBag.Euro = currencies.First(x => x.Code == CurrencyCodes.Euro).Value;
+            ViewBag.Dolar = currencies.First(x => x.Code == CurrencyCodes.Dollar).Value;
         }
         else
         {
-            ViewBag.Euro = currencies.Message;
-            ViewBag.Dolar = currencies.Message;
+            // Worker'ın ilk çekimi henüz bitmedi (uygulama yeni açıldı).
+            ViewBag.Euro = Messages.CurrencyDataLoading;
+            ViewBag.Dolar = Messages.CurrencyDataLoading;
         }
 
         return View();

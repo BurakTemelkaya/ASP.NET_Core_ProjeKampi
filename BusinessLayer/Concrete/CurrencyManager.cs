@@ -1,7 +1,6 @@
 ﻿using BusinessLayer.Abstract;
 using BusinessLayer.Constants;
 using BusinessLayer.Models;
-using CoreLayer.Aspects.AutoFac.Caching;
 using CoreLayer.Utilities.Results;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -33,7 +32,7 @@ public class CurrencyManager : ICurrencyService
     /// </summary>
     /// <param name="currencys"></param>
     /// <returns></returns>
-    [CacheAspect(60)]
+    // Cache CoreDemo.CurrencyWorker tarafında tutuluyor; burada cache'lenirse worker yenileyemez.
     public async Task<IDataResult<List<CurrencysModel>>> GetCurrencyDataAsync(params string[] currencys)
     {
         try

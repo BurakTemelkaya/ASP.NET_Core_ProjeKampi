@@ -114,6 +114,7 @@
         public static string BannedLaterThanTheCurrentDate = "Girilen ban süresi şu anki tarihten ileride olamaz.";
 
         public static string ErrorFetchingCurrencyData = "Döviz verileri alınırken bir hata oluştu.";
+        public static string CurrencyDataLoading = "Yükleniyor...";
 
         public static string EmptyLoginLoggerData = "Giriş kaydı bulunamadı.";
     }

@@ -36,6 +36,7 @@ using System.Globalization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<CurrencyWorker>();
 
 builder.Services.AddRazorPages();
 
